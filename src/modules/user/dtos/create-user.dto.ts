@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsEnum,
+  IsNotEmpty,
   IsOptional,
   IsString,
   Length,
@@ -49,7 +50,8 @@ export class CreateUserDto implements Omit<ICreateUserRequest, 'image_url'> {
     required: true,
     example: '12345678',
   })
-  @IsEmail()
+  @IsNotEmpty()
+  @IsString()
   @Length(8, 8)
   password: string;
 
@@ -59,7 +61,7 @@ export class CreateUserDto implements Omit<ICreateUserRequest, 'image_url'> {
     required: false,
   })
   @IsOptional()
-  image_url?: any;
+  image?: any;
 
   @ApiProperty({
     enum: UserRoles,

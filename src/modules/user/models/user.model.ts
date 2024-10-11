@@ -29,7 +29,7 @@ export class User extends Model {
   // @Column({type: DataType.INTEGER, allowNull: true })
   // telegram_id?: string;
 
-  @Column({ type: DataType.TEXT, allowNull: true })
+  @Column({ type: DataType.TEXT, allowNull: true, defaultValue: "user.png" })
   image?: string;
 
   @Column({

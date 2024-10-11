@@ -11,7 +11,8 @@ import { TelegrafModule } from 'nestjs-telegraf';
 // import { BotModule } from '@client';
 import { session } from 'telegraf';
 import { ExceptionHandlerFilter } from '@filters';
-// import { SeedsModule } from '@seeds';
+import { User, UserModule } from './modules/user';
+import { SeedsModule } from '@seeds';
 
 @Module({
   imports: [
@@ -46,7 +47,7 @@ import { ExceptionHandlerFilter } from '@filters';
             username: config.get('database.user'),
             password: config.get('database.password'),
             database: config.get('database.dbName'),
-            models: [],
+            models: [User],
             synchronize: true,
             // sync: {force: true},
             logging: console.log,
@@ -65,7 +66,7 @@ import { ExceptionHandlerFilter } from '@filters';
     //     middlewares: [session()]
     //   })
     // }),
-    // SeedsModule,
+    UserModule, SeedsModule,
   ],
   providers: [
     {
@@ -76,14 +77,14 @@ import { ExceptionHandlerFilter } from '@filters';
     //   provide: APP_GUARD,
     //   useClass: ThrottlerGuard
     // },    
-    {
-      useClass: CheckAuthGuard,
-      provide: APP_GUARD,
-    },
-    {
-      useClass: CheckRoleGuard,
-      provide: APP_GUARD,
-    },
+    // {
+    //   useClass: CheckAuthGuard,
+    //   provide: APP_GUARD,
+    // },
+    // {
+    //   useClass: CheckRoleGuard,
+    //   provide: APP_GUARD,
+    // },
   ],
 })
 export class AppModule {}
