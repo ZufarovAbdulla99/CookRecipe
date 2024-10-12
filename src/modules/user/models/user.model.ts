@@ -39,7 +39,4 @@ export class User extends Model {
     defaultValue: UserRoles.user,
   })
   role: UserRoles;
-
-  // @HasMany(() => Order)
-  // orders: Order[];
 }

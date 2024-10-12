@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User, UserRoles } from './models';
-import { ICreateUserRequest } from './interfaces';
+import { ICreateUserRequest, IUpdateUserRequest } from './interfaces';
 import { hash } from 'bcrypt';
+import { unlink } from 'fs';
+import { join } from 'path';
 
 
 @Injectable()
@@ -11,15 +13,27 @@ export class UserService {
     @InjectModel(User) private userModel: typeof User,
   ) {}
 
-  async getAllUsers(): Promise<User[]> {
-    const data = await this.userModel.findAll({
+  async getAllUsers(): Promise<User[] | string> {
+    const users = await this.userModel.findAll({
       include: [],
     });
-    return data;
+    // console.log(data[0]?.dataValues)
+    if(!users){
+      return "Any User not found"
+    }
+    return users;
+  }
+
+  async getUserById(userId: number): Promise<User | string> {
+    const user = await this.userModel.findByPk(userId, {include: []});
+    if(!user){
+      return "User not found"
+    }
+    return user;
   }
 
   async createUser(payload: ICreateUserRequest): Promise<void> {
-    // console.log(payload, "*")
+    // console.log(payload.image, "*")
     const hashedPassword = await hash(payload.password, 12)
     await this.userModel.create({
         first_name: payload.first_name,
@@ -27,45 +41,74 @@ export class UserService {
         username: payload.username,
         email: payload.email,
         password: hashedPassword,
-        image: payload.image_url,
+        image: payload.image,
         role: payload.role,
     })
 }
 
-  // async uploadUserImage(payload: UploadUserImageRequest): Promise<void> {
-  //   // CHECK IF USER EXISTS
-  //   await this.#_checkUser(payload.userId);
 
-  //   const foundedUser = await this.userModel.findByPk(payload.userId);
+async updateUser(userId: number, payload: IUpdateUserRequest): Promise<void | string> {
 
-  //   let imageUrl: null | UploadFileResponse = null;
+    // console.log(user) // // null
+    const existUser = await this.userModel.findByPk(userId)
 
-  //   imageUrl = await this.uploadService.uploadFile({
-  //     destination: 'uploads',
-  //     file: payload.image,
-  //   });
+    if(!existUser) {
+      return "User not found can't updated"
+    }
 
-  //   await this.userModel.update(
-  //     { image: imageUrl ? imageUrl?.imageUrl : '' },
-  //     { where: { id: payload.userId } },
-  //   );
-  // }
+    if (existUser.image && existUser.image != "user.png")
+      unlink(join(__dirname, '..', '..', '..', 'uploads', existUser.image), (err) => {
+        if(err) {
+            console.log("File o'chirishda xatolik yoki fayl mavjud emas")
+        }
+    });
 
-  async deleteUser(userId: number): Promise<void> {
-    const foundedUser = await this.userModel.findByPk(userId);
+    const hashedPassword = await hash(payload.password, 12);
 
-    // if (foundedUser?.image) {
-    //   await this.uploadService.removeFile({ fileName: foundedUser.image });
-    // }
+    await existUser.update({
+      first_name: payload.first_name,
+        last_name: payload.last_name,
+        username: payload.username,
+        email: payload.email,
+        password: hashedPassword,
+        image: payload.image,
+        role: payload.role,
+    });
+}
+
+  async deleteUser(userId: number): Promise<void | string> {
+    const existUser = await this.userModel.findByPk(userId)
+
+    if (!existUser) {
+      return 'User not found'
+    }
+
+    if (existUser.image && existUser.image != "user.png")
+      unlink(join(__dirname, '..', '..', '..', 'uploads', existUser.image), (err) => {
+        if(err) {
+            console.log("File o'chirishda xatolik yoki fayl mavjud emas")
+        }
+    });
 
     await this.userModel.destroy({ where: { id: userId } });
   }
 
-  async #_checkUser(userId: number): Promise<void> {
-    const user = await this.userModel.findByPk(userId);
+  async deleteAllUsers(): Promise<void | string> {
+    const allUsers = await this.userModel.findAll()
 
-    if (!user) {
-      throw new Error('User not found');
+    if (!allUsers) {
+      return 'Any User not found'
     }
+
+    allUsers.forEach(u => {
+      if (u.image && u.image != "user.png")
+        unlink(join(__dirname, '..', '..', '..', 'uploads', u.image), (err) => {
+          if(err) {
+              console.log("File o'chirishda xatolik yoki fayl mavjud emas")
+          }
+      });
+    })
+    
+    await this.userModel.truncate();
   }
 }

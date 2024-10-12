@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -12,12 +13,13 @@ import {
 import { User, UserRoles } from './models';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto, UpdateUserImageDto } from './dtos';
+import { CreateUserDto, UpdateUserDto, UpdateUserImageDto } from './dtos';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Protected, Roles } from '@decorators';
+import { multerConfig } from '@config';
 
-@ApiTags("Users")
-@Controller('users')
+@ApiTags("User")
+@Controller('user')
 export class UserController {
   constructor(private service: UserService) {}
 
@@ -25,9 +27,18 @@ export class UserController {
   @Protected(true)
   @Roles([UserRoles.admin])
   @ApiOperation({ summary: 'Barcha userlarni olish' })
-  @Get()
-  async getAllUsers(): Promise<User[]> {
+  @Get("/")
+  async getAllUsers(): Promise<User[] | string> {
     return await this.service.getAllUsers();
+  }
+
+  @ApiBearerAuth()
+  @Protected(true)
+  @Roles([UserRoles.admin])
+  @ApiOperation({ summary: 'Userni idsi bo\'yicha olish' })
+  @Get("/:userId")
+  async getUserById(@Param("userId", ParseIntPipe) userId: number): Promise<User | string> {
+    return await this.service.getUserById(userId);
   }
 
   @ApiBearerAuth()
@@ -36,27 +47,29 @@ export class UserController {
   @ApiOperation({ summary: 'Yangi user yaratish' })
   @ApiConsumes('multipart/form-data')
   @Post('/add')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image', multerConfig))
   async createUser(
     @Body() payload: CreateUserDto,
-    @UploadedFile() image_url: Express.Multer.File,
+    @UploadedFile() image: Express.Multer.File,
   ): Promise<void> {
-    await this.service.createUser({ ...payload, image_url });
+    // console.log(image, "**")
+    await this.service.createUser({ ...payload, image: image ? image.filename : "user.png"});
   }
 
-  // @ApiBearerAuth()
-  // @Protected(true)
-  // @Roles([UserRoles.admin, UserRoles.user])
-  // @ApiOperation({ summary: 'User rasmini qo\'shish va/yoki yangilash' })
-  // @ApiConsumes('multipart/form-data')
-  // @Post('/add/image')
-  // @UseInterceptors(FileInterceptor('image'))
-  // async uploadUserImage(
-  //   @Body() payload: UpdateUserImageDto,
-  //   @UploadedFile() image: Express.Multer.File,
-  // ): Promise<void> {
-  //   await this.service.uploadUserImage({...payload, image});
-  // }
+  @ApiBearerAuth()
+  @Protected(true)
+  @Roles([UserRoles.admin, UserRoles.user])
+  @ApiOperation({ summary: 'Userni update qilish' })
+  @ApiConsumes('multipart/form-data')
+  @Patch('/update/:userId')
+  @UseInterceptors(FileInterceptor('image', multerConfig))
+  async updateUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() payload: UpdateUserDto,
+    @UploadedFile() image: Express.Multer.File,
+  ): Promise<void | string> {
+    return await this.service.updateUser(userId, {...payload, image: image ? image.filename : "user.png"});
+  }
 
   @ApiBearerAuth()
   @Protected(true)
@@ -65,7 +78,16 @@ export class UserController {
   @ApiOperation({ summary: "Userni o'chirish" })
   async deleteUser(
     @Param('userId', ParseIntPipe) userId: number,
-  ): Promise<void> {
-    await this.service.deleteUser(userId);
+  ): Promise<void | string> {
+    return await this.service.deleteUser(userId);
+  }
+
+  @ApiBearerAuth()
+  @Protected(true)
+  @Roles([UserRoles.admin])
+  @Delete('/delete')
+  @ApiOperation({ summary: "Hamma Userlarni o'chirish" })
+  async deleteAllUsers(): Promise<void | string> {
+    return await this.service.deleteAllUsers();
   }
 }
