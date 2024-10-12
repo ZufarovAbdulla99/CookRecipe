@@ -1,0 +1,6 @@
+export * from "./models"
+export * from "./interfaces"
+export * from "./dtos"
+export * from "./ingredient.service"
+export * from "./ingredient.controller"
+export * from "./ingredient.module"
