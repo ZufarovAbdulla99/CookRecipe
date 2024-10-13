@@ -22,7 +22,8 @@ import { multerConfig } from '@config';
 import { Category } from './models';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dtos';
-import { UserRoles } from '../user';
+import { UserRoles } from 'src/enum';
+
 
 @ApiTags('Category')
 @Controller('category')
@@ -38,9 +39,9 @@ export class CategoryController {
     return await this.service.getAllCategories();
   }
 
-  // @ApiBearerAuth()
+  @ApiBearerAuth()
   @Protected(false)
-  @Roles([UserRoles.admin, UserRoles.user])
+  @Roles([UserRoles?.admin, UserRoles?.user])
   @ApiOperation({ summary: "Categoryni idsi bo'yicha olish" })
   @Get('/:categoryId')
   async getCategoryById(

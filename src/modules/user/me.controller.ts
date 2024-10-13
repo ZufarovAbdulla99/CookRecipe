@@ -2,10 +2,10 @@ import { Controller, Get, Request } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Protected, Roles } from '@decorators';
 import { RequestInterface } from '@guards';
-import { User, UserRoles } from './models';
+import { User } from './models';
 import { MeService } from './me.service';
 
-@ApiTags("Me")
+@ApiTags('Me')
 @Controller('me')
 export class MeController {
   constructor(private service: MeService) {}

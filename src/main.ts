@@ -14,12 +14,12 @@ async function bootstrap() {
 
   // CORS enabled
   app.enableCors({
-    origin: "*",
-    methods: ["GET", "PUT", "PATCH", "POST", "DELETE"]
-  })
+    origin: '*',
+    methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  });
 
   // COMPRESSION
-  app.use(compression())
+  app.use(compression());
 
   // CSURF configuration
   // app.use(csurf());

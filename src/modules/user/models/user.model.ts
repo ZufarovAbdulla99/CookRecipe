@@ -1,10 +1,12 @@
 import { Table, Model, Column, DataType, HasMany } from 'sequelize-typescript';
+import { UserRoles } from 'src/enum';
+import { Recipe } from 'src/modules/recipe';
 // import { Order, Review } from '@modules';
 
-export enum UserRoles {
-  user = 'USER',
-  admin = 'ADMIN',
-}
+// export enum UserRoles {
+//   user = 'USER',
+//   admin = 'ADMIN',
+// }
 
 @Table({ tableName: 'user', timestamps: true })
 export class User extends Model {
@@ -29,7 +31,7 @@ export class User extends Model {
   // @Column({type: DataType.INTEGER, allowNull: true })
   // telegram_id?: string;
 
-  @Column({ type: DataType.TEXT, allowNull: true, defaultValue: "user.png" })
+  @Column({ type: DataType.TEXT, allowNull: true, defaultValue: 'user.png' })
   image?: string;
 
   @Column({
@@ -39,4 +41,7 @@ export class User extends Model {
     defaultValue: UserRoles.user,
   })
   role: UserRoles;
+
+  @HasMany(() => Recipe)
+  recipes: Recipe[]
 }

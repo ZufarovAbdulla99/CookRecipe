@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { hash } from 'bcrypt';
 import { unlink } from 'fs';
 import { join } from 'path';
 import { Category } from './models';
@@ -44,10 +43,10 @@ export class CategoryService {
     const existCategory = await this.categoryModel.findByPk(categoryId);
 
     if (!existCategory) {
-      return "Category not found can't updated";
+      return 'Category not found';
     }
 
-    if (existCategory.image && existCategory.image != 'user.png')
+    if (existCategory.image && existCategory.image != 'user.png') {
       unlink(
         join(__dirname, '..', '..', '..', 'uploads', existCategory.image),
         (err) => {
@@ -56,6 +55,7 @@ export class CategoryService {
           }
         },
       );
+    }
 
     await existCategory.update({
       name: payload.name,
@@ -70,7 +70,7 @@ export class CategoryService {
       return 'Category not found';
     }
 
-    if (existCategory.image && existCategory.image != 'user.png')
+    if (existCategory.image && existCategory.image != 'user.png') {
       unlink(
         join(__dirname, '..', '..', '..', 'uploads', existCategory.image),
         (err) => {
@@ -79,6 +79,7 @@ export class CategoryService {
           }
         },
       );
+    }
 
     await this.categoryModel.destroy({ where: { id: categoryId } });
   }
@@ -91,12 +92,13 @@ export class CategoryService {
     }
 
     allCategories.forEach((c) => {
-      if (c.image && c.image != 'user.png')
+      if (c.image && c.image != 'user.png') {
         unlink(join(__dirname, '..', '..', '..', 'uploads', c.image), (err) => {
           if (err) {
             console.log("File o'chirishda xatolik yoki fayl mavjud emas");
           }
         });
+      }
     });
 
     await this.categoryModel.truncate();

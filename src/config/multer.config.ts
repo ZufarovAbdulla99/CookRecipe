@@ -1,5 +1,5 @@
-import {extname} from 'path';
-import {diskStorage} from 'multer';
+import { extname } from 'path';
+import { diskStorage } from 'multer';
 
 export const multerConfig = {
   storage: diskStorage({

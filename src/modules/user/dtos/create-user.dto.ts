@@ -8,9 +8,9 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ICreateUserRequest } from '../interfaces';
-import { UserRoles } from '../models';
+import { UserRoles } from 'src/enum';
 
-export class CreateUserDto implements Omit<ICreateUserRequest, 'image_url'> {
+export class CreateUserDto implements Omit<ICreateUserRequest, 'image'> {
   @ApiProperty({
     type: String,
     required: true,
@@ -22,7 +22,7 @@ export class CreateUserDto implements Omit<ICreateUserRequest, 'image_url'> {
   @ApiProperty({
     type: String,
     required: true,
-    example: 'Jo\'rayev',
+    example: "Jo'rayev",
   })
   @IsString()
   last_name: string;
@@ -52,7 +52,7 @@ export class CreateUserDto implements Omit<ICreateUserRequest, 'image_url'> {
   })
   @IsNotEmpty()
   @IsString()
-  @Length(8, 8)
+  @Length(4, 8)
   password: string;
 
   @ApiProperty({
@@ -65,7 +65,7 @@ export class CreateUserDto implements Omit<ICreateUserRequest, 'image_url'> {
 
   @ApiProperty({
     enum: UserRoles,
-    name: "Role",
+    name: 'Role',
     required: false,
   })
   @IsOptional()

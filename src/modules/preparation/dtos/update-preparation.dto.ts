@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { IUpdatePreparationRequest } from '../interfaces';
 
@@ -9,7 +9,7 @@ export class UpdatePreparationDto implements IUpdatePreparationRequest
     required: false,
     example: "Taom tayyorlash bosqichlarini yozing",
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   steps?: string;
 }

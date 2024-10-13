@@ -7,12 +7,12 @@ export class UpdateCategoryDto
 {
   @ApiProperty({
     type: String,
-    required: true,
+    required: false,
     example: "Taom turi misol uchun Pizza yoki sho'rva",
   })
   @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @ApiProperty({
     type: String,

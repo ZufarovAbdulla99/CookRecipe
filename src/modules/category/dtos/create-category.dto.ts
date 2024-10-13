@@ -8,6 +8,7 @@ export class CreateCategoryDto
   @ApiProperty({
     type: String,
     required: true,
+    uniqueItems: true,
     example: "Taom turi misol uchun Pizza yoki sho'rva",
   })
   @IsNotEmpty()

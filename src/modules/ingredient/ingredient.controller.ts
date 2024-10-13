@@ -14,10 +14,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Protected, Roles } from '@decorators';
-import { UserRoles } from '../user';
 import { IngredientService } from './ingredient.service';
 import { Ingredient } from './models';
 import { CreateIngredientDto, UpdateIngredientDto } from './dtos';
+import { UserRoles } from 'src/enum';
 
 @ApiTags('Ingredient')
 @Controller('ingredient')
